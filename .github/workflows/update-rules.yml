@@ -76,37 +76,151 @@ jobs:
           sed -i '/^[[:space:]]*$/d' temp_tiktok.txt && sed -i '/^#/d' temp_tiktok.txt
           sort -u temp_tiktok.txt > tiktok_rules.txt
 
-          # 6. PROSES RULE FINTECH, BANK & ONLINE SHOP (SUMBER STABIL)
-          # A. Ambil dari v2fly resmi (Category Bank ID & E-Commerce)
+          # 6. PROSES RULE FINTECH, PERBANKAN INDONESIA LENGKAP & ONLINE SHOP
+          # A. Fetch otomatis dari v2fly
           curl -sSLf "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-bank-id" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_fintech.txt || true
           curl -sSLf "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-ecommerce" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_fintech.txt || true
 
-          # B. Ambil dari Loyalsoldier (E-Commerce & Paypal/Fintech)
-          curl -sSLf "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/direct-list.txt" | grep -iE 'shopee|tokopedia|lazada|blibli|bukalapak|bca|mandiri|bri|bni|gopay|ovo|dana' >> temp_fintech.txt || true
-
-          # C. Domain penting lokal sebagai penopang utama
+          # B. BANK BUMN & SYARIAH UTAMA
           echo "bca.co.id" >> temp_fintech.txt
           echo "klikbca.com" >> temp_fintech.txt
           echo "mybca.bca.co.id" >> temp_fintech.txt
+          echo "bcasyariah.co.id" >> temp_fintech.txt
           echo "bankmandiri.co.id" >> temp_fintech.txt
           echo "livin.bankmandiri.co.id" >> temp_fintech.txt
+          echo "mandiriripples.com" >> temp_fintech.txt
           echo "bri.co.id" >> temp_fintech.txt
           echo "brimo.bri.co.id" >> temp_fintech.txt
           echo "bni.co.id" >> temp_fintech.txt
           echo "bniwondr.co.id" >> temp_fintech.txt
           echo "bsi.co.id" >> temp_fintech.txt
+          echo "bankbsi.co.id" >> temp_fintech.txt
+          echo "bankbtn.co.id" >> temp_fintech.txt
+          echo "btn.co.id" >> temp_fintech.txt
+
+          # C. BANK SWASTA & BANK NASIONAL
+          echo "cimbniaga.co.id" >> temp_fintech.txt
+          echo "octoclicks.com" >> temp_fintech.txt
+          echo "danamon.co.id" >> temp_fintech.txt
+          echo "permatabank.co.id" >> temp_fintech.txt
+          echo "panin.co.id" >> temp_fintech.txt
+          echo "maybank.co.id" >> temp_fintech.txt
+          echo "ocbc.id" >> temp_fintech.txt
+          echo "ocbcnisp.com" >> temp_fintech.txt
+          echo "btpn.com" >> temp_fintech.txt
+          echo "sinarmas.co.id" >> temp_fintech.txt
+          echo "banksinarmas.com" >> temp_fintech.txt
+          echo "bankmega.com" >> temp_fintech.txt
+          echo "dbs.id" >> temp_fintech.txt
+          echo "dbs.com" >> temp_fintech.txt
+          echo "uob.co.id" >> temp_fintech.txt
+          echo "bankmuamalat.co.id" >> temp_fintech.txt
+          echo "bankpamon.co.id" >> temp_fintech.txt
+          echo "bankbukopin.co.id" >> temp_fintech.txt
+          echo "kbbukopin.com" >> temp_fintech.txt
+          echo "bankmas.co.id" >> temp_fintech.txt
+          echo "mstar.co.id" >> temp_fintech.txt
+          echo "nanobank.id" >> temp_fintech.txt
+          echo "bankina.co.id" >> temp_fintech.txt
+          echo "bankindex.co.id" >> temp_fintech.txt
+          echo "bankganesha.co.id" >> temp_fintech.txt
+          echo "bankmestika.co.id" >> temp_fintech.txt
+          echo "bankmayapada.com" >> temp_fintech.txt
+          echo "bankwoorisaudara.com" >> temp_fintech.txt
+          echo "bankmultarta.co.id" >> temp_fintech.txt
+          echo "bankcta.co.id" >> temp_fintech.txt
+          echo "banksahabatsampoerna.com" >> temp_fintech.txt
+          echo "banksinarharapanbali.co.id" >> temp_fintech.txt
+          echo "bankvictoria.co.id" >> temp_fintech.txt
+          echo "ccbindonesia.com" >> temp_fintech.txt
+          echo "icbc.co.id" >> temp_fintech.txt
+          echo "bankofchina.com" >> temp_fintech.txt
+          echo "shinhan.co.id" >> temp_fintech.txt
+          echo "jtrustbank.co.id" >> temp_fintech.txt
+          echo "bankresonaperdania.co.id" >> temp_fintech.txt
+          echo "mizuho-cb.com" >> temp_fintech.txt
+          echo "smbc.co.id" >> temp_fintech.txt
+
+          # D. BANK PEMBANGUNAN DAERAH (BPD SELURUH INDONESIA)
+          echo "bankdki.co.id" >> temp_fintech.txt
+          echo "bankjateng.co.id" >> temp_fintech.txt
+          echo "bankjatim.co.id" >> temp_fintech.txt
+          echo "bjb.co.id" >> temp_fintech.txt
+          echo "bankbjb.co.id" >> temp_fintech.txt
+          echo "bankjabar.co.id" >> temp_fintech.txt
+          echo "bankkalsel.co.id" >> temp_fintech.txt
+          echo "bankkalbar.co.id" >> temp_fintech.txt
+          echo "bankkaltimtara.co.id" >> temp_fintech.txt
+          echo "bankkalteng.co.id" >> temp_fintech.txt
+          echo "banksumselbabel.com" >> temp_fintech.txt
+          echo "banksumut.co.id" >> temp_fintech.txt
+          echo "banknagari.co.id" >> temp_fintech.txt
+          echo "bankriaukepri.co.id" >> temp_fintech.txt
+          echo "banklampung.co.id" >> temp_fintech.txt
+          echo "bankjambi.co.id" >> temp_fintech.txt
+          echo "bankbengkulu.co.id" >> temp_fintech.txt
+          echo "bankntb.co.id" >> temp_fintech.txt
+          echo "bankntt.co.id" >> temp_fintech.txt
+          echo "banksulselbar.co.id" >> temp_fintech.txt
+          echo "banksulutgo.co.id" >> temp_fintech.txt
+          echo "banksulteng.co.id" >> temp_fintech.txt
+          echo "banksultra.co.id" >> temp_fintech.txt
+          echo "bankmaluku.co.id" >> temp_fintech.txt
+          echo "bankpapua.co.id" >> temp_fintech.txt
+          echo "bankbali.co.id" >> temp_fintech.txt
+          echo "bankbpdbali.id" >> temp_fintech.txt
+          echo "bpddiy.co.id" >> temp_fintech.txt
+
+          # E. BANK DIGITAL
           echo "bankjago.com" >> temp_fintech.txt
+          echo "jago.com" >> temp_fintech.txt
           echo "seabank.co.id" >> temp_fintech.txt
+          echo "blubybcadigital.id" >> temp_fintech.txt
+          echo "jenius.com" >> temp_fintech.txt
+          echo "neo-bank.id" >> temp_fintech.txt
+          echo "bankneo.co.id" >> temp_fintech.txt
+          echo "allocloud.id" >> temp_fintech.txt
+          echo "allobank.id" >> temp_fintech.txt
+          echo "motionbank.id" >> temp_fintech.txt
+          echo "linebank.co.id" >> temp_fintech.txt
+          echo "superbank.id" >> temp_fintech.txt
+          echo "krom.id" >> temp_fintech.txt
+          echo "hijra.id" >> temp_fintech.txt
+          echo "aladinbank.id" >> temp_fintech.txt
+          echo "bankaladin.com" >> temp_fintech.txt
+          echo "amarbank.co.id" >> temp_fintech.txt
+          echo "tunaiku.com" >> temp_fintech.txt
+
+          # F. E-WALLET, QRIS & PAYMENT GATEWAY
           echo "gopay.co.id" >> temp_fintech.txt
           echo "gojek.com" >> temp_fintech.txt
           echo "ovo.id" >> temp_fintech.txt
           echo "dana.id" >> temp_fintech.txt
+          echo "shopeepay.co.id" >> temp_fintech.txt
+          echo "linkaja.id" >> temp_fintech.txt
+          echo "flip.id" >> temp_fintech.txt
+          echo "midtrans.com" >> temp_fintech.txt
+          echo "xendit.co" >> temp_fintech.txt
+          echo "doku.com" >> temp_fintech.txt
+          echo "oyindonesia.com" >> temp_fintech.txt
+          echo "isaku.co.id" >> temp_fintech.txt
+          echo "sakuku.com" >> temp_fintech.txt
+          echo "faspay.co.id" >> temp_fintech.txt
+          echo "espay.id" >> temp_fintech.txt
+          echo "durianpay.id" >> temp_fintech.txt
+          echo "tripay.co.id" >> temp_fintech.txt
+
+          # G. ONLINE SHOP & E-COMMERCE
           echo "shopee.co.id" >> temp_fintech.txt
+          echo "shopeesz.com" >> temp_fintech.txt
           echo "tokopedia.com" >> temp_fintech.txt
           echo "tokopedia.net" >> temp_fintech.txt
           echo "lazada.co.id" >> temp_fintech.txt
+          echo "lazada.com" >> temp_fintech.txt
           echo "blibli.com" >> temp_fintech.txt
           echo "bukalapak.com" >> temp_fintech.txt
+          echo "zalora.co.id" >> temp_fintech.txt
+          echo "tokopedia.link" >> temp_fintech.txt
 
           sed -i '/^[[:space:]]*$/d' temp_fintech.txt && sed -i '/^#/d' temp_fintech.txt
           sort -u temp_fintech.txt > fintech_rules.txt
@@ -150,7 +264,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt tiktok_rules.txt fintech_rules.txt geosite.dat geoip.dat
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Fix 404 URL, auto-fetch stable fintech & ecommerce rules, rebuild geosite.dat"
+            git commit -m "Update complete Indonesian banks, fintech, and e-commerce ruleset"
             git pull --rebase origin main -X ours
             git push
           fi
@@ -160,7 +274,7 @@ jobs:
         with:
           tag_name: release
           name: "Latest Geosite & GeoIP Ruleset Build"
-          body: "Automated build of geosite.dat, geoip.dat, and domain lists with stable Fintech/Online Shop sources."
+          body: "Automated build of geosite.dat, geoip.dat, and domain lists with ALL Indonesian Banks, Fintech, & Online Shops."
           files: |
             geosite.dat
             geoip.dat
