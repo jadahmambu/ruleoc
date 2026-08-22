@@ -93,4 +93,8 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt geosite.dat
-          git diff-index --quiet HEAD || (git pull --rebase origin main && git commit -m "Clean build geosite.dat and rulesets" && git push)
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Auto-compile geosite.dat and update rulesets"
+            git pull --rebase origin main -X ours
+            git push
+          fi
