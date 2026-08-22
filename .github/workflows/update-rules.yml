@@ -91,47 +91,10 @@ jobs:
           cd ..
           rm -rf generator data
 
-      - name: Build geoip.dat Binary
+      - name: Fetch Official geoip.dat
         run: |
-          mkdir -p ip_data
-          
-          # Unduh daftar IP CIDR resmi
-          curl -sSL "https://raw.githubusercontent.com/v2fly/geoip/release/text/facebook.txt" -o ip_data/meta
-          curl -sSL "https://raw.githubusercontent.com/v2fly/geoip/release/text/id.txt" -o ip_data/id
-          curl -sSL "https://raw.githubusercontent.com/v2fly/geoip/release/text/private.txt" -o ip_data/private
-
-          # Clone generator geoip
-          git clone https://github.com/v2fly/geoip.git geoip_src
-          cd geoip_src
-
-          # Buat config.json sesuai spesifikasi kompiler terbaru v2fly/geoip
-          cat <<EOF > config.json
-          {
-            "input": [
-              {
-                "type": "v2rayGeoIP1",
-                "action": "add",
-                "args": {
-                  "uri": "../ip_data"
-                }
-              }
-            ],
-            "output": [
-              {
-                "type": "v2rayGeoIP1",
-                "action": "output",
-                "args": {
-                  "outputName": "../geoip.dat"
-                }
-              }
-            ]
-          }
-          EOF
-
-          # Jalankan kompilasi menggunakan file konfigurasi
-          go run ./ -c config.json
-          cd ..
-          rm -rf geoip_src ip_data
+          # Ambil rilis biner geoip.dat resmi v2fly yang diperbarui harian
+          curl -sSL "https://github.com/v2fly/geoip/releases/latest/download/geoip.dat" -o geoip.dat
 
       - name: Commit and Push All Output Files
         run: |
@@ -139,7 +102,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt geosite.dat geoip.dat
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Auto-compile geosite.dat, geoip.dat, and update rulesets"
+            git commit -m "Auto-compile geosite.dat, fetch geoip.dat, and update rulesets"
             git pull --rebase origin main -X ours
             git push
           fi
