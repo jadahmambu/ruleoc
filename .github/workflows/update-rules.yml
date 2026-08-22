@@ -23,7 +23,7 @@ jobs:
       - name: Fetch and Process Domain Rules
         run: |
           mkdir -p data
-          touch temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt
+          touch temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt temp_fintech.txt
 
           # 1. PROSES RULE ADS & TRACKER
           curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_ads.txt || true
@@ -76,7 +76,33 @@ jobs:
           sed -i '/^[[:space:]]*$/d' temp_tiktok.txt && sed -i '/^#/d' temp_tiktok.txt
           sort -u temp_tiktok.txt > tiktok_rules.txt
 
-          rm -f temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt
+          # 6. PROSES RULE FINTECH (BANK & E-WALLET INDONESIA)
+          echo "bca.co.id" >> temp_fintech.txt
+          echo "klikbca.com" >> temp_fintech.txt
+          echo "mybca.bca.co.id" >> temp_fintech.txt
+          echo "bankmandiri.co.id" >> temp_fintech.txt
+          echo "mandiriripples.com" >> temp_fintech.txt
+          echo "bri.co.id" >> temp_fintech.txt
+          echo "bni.co.id" >> temp_fintech.txt
+          echo "cimbniaga.co.id" >> temp_fintech.txt
+          echo "octoclicks.com" >> temp_fintech.txt
+          echo "danamon.co.id" >> temp_fintech.txt
+          echo "permata bank.co.id" >> temp_fintech.txt
+          echo "bsi.co.id" >> temp_fintech.txt
+          echo "bankjago.com" >> temp_fintech.txt
+          echo "seabank.co.id" >> temp_fintech.txt
+          echo "gopay.co.id" >> temp_fintech.txt
+          echo "gojek.com" >> temp_fintech.txt
+          echo "ovo.id" >> temp_fintech.txt
+          echo "dana.id" >> temp_fintech.txt
+          echo "shopeepay.co.id" >> temp_fintech.txt
+          echo "linkaja.id" >> temp_fintech.txt
+          echo "flip.id" >> temp_fintech.txt
+
+          sed -i '/^[[:space:]]*$/d' temp_fintech.txt && sed -i '/^#/d' temp_fintech.txt
+          sort -u temp_fintech.txt > fintech_rules.txt
+
+          rm -f temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt temp_fintech.txt
 
       - name: Build geosite.dat Binary
         run: |
@@ -85,6 +111,7 @@ jobs:
           cp nsfw_rules.txt data/nsfw
           cp meta_rules.txt data/meta
           cp tiktok_rules.txt data/tiktok
+          cp fintech_rules.txt data/fintech
 
           sed -i 's/^\*\.//g' data/*
           sed -i 's/^\*//g' data/*
@@ -95,6 +122,7 @@ jobs:
           grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/nsfw > data/nsfw.clean && mv data/nsfw.clean data/nsfw
           grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/meta > data/meta.clean && mv data/meta.clean data/meta
           grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/tiktok > data/tiktok.clean && mv data/tiktok.clean data/tiktok
+          grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/fintech > data/fintech.clean && mv data/fintech.clean data/fintech
 
           git clone https://github.com/v2fly/domain-list-community.git generator
           cd generator
@@ -111,9 +139,9 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt tiktok_rules.txt geosite.dat geoip.dat
+          git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt tiktok_rules.txt fintech_rules.txt geosite.dat geoip.dat
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Add TikTok ruleset and rebuild geosite.dat"
+            git commit -m "Add Fintech ruleset and rebuild geosite.dat"
             git pull --rebase origin main -X ours
             git push
           fi
@@ -123,7 +151,7 @@ jobs:
         with:
           tag_name: release
           name: "Latest Geosite & GeoIP Ruleset Build"
-          body: "Automated build of geosite.dat, geoip.dat, and domain lists including TikTok."
+          body: "Automated build of geosite.dat, geoip.dat, and domain lists including Fintech/Bank/E-Wallet."
           files: |
             geosite.dat
             geoip.dat
@@ -132,5 +160,6 @@ jobs:
             nsfw_rules.txt
             meta_rules.txt
             tiktok_rules.txt
+            fintech_rules.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
