@@ -41,11 +41,22 @@ jobs:
           # -------------------------------------------------------------
           # 3. PROSES RULE META (FB, IG, WA, Threads) -> meta_rules.txt
           # -------------------------------------------------------------
-          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/facebook.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp_meta.txt || true
-          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/instagram.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp_meta.txt || true
-          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/whatsapp.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp_meta.txt || true
+          # Ambil domain Meta dari sumber v2fly/domain-list-community
+          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/facebook" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
+          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/instagram" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
+          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/whatsapp" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
 
-          sed -i '/^[[:space:]]*$/d' temp_meta.txt && sed -i '/^#/d' temp_meta.txt
+          # Tambahkan domain cadangan esensial
+          echo "facebook.com" >> temp_meta.txt
+          echo "instagram.com" >> temp_meta.txt
+          echo "whatsapp.com" >> temp_meta.txt
+          echo "whatsapp.net" >> temp_meta.txt
+          echo "threads.net" >> temp_meta.txt
+          echo "meta.com" >> temp_meta.txt
+
+          # Bersihkan baris kosong dan duplikat
+          sed -i '/^[[:space:]]*$/d' temp_meta.txt
+          sed -i '/^#/d' temp_meta.txt
           sort -u temp_meta.txt > meta_rules.txt
 
           # Bersihkan file sementara
@@ -56,4 +67,4 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt nsfw_rules.txt meta_rules.txt
-          git diff-index --quiet HEAD || (git commit -m "Auto-update separate rulesets (Ads, NSFW, Meta)" && git push)
+          git diff-index --quiet HEAD || (git commit -m "Fix Meta parsing and auto-update rulesets" && git push)
