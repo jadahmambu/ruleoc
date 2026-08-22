@@ -1,4 +1,4 @@
-name: Update All Rulesets Separately
+name: Update Rulesets and Build Geosite
 
 on:
   schedule:
@@ -12,8 +12,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch and Process Rules
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.20'
+
+      - name: Fetch and Process Domain Rules
         run: |
+          mkdir -p data
           touch temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt
 
           # 1. PROSES RULE ADS & TRACKER
@@ -59,9 +65,25 @@ jobs:
 
           rm -f temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt
 
-      - name: Commit and Push Updated Lists
+      - name: Build geosite.dat Binary
+        run: |
+          # Persiapan struktur folder generator domain-list-community
+          cp adblock_rules.txt data/adblock
+          cp malware_rules.txt data/malware
+          cp nsfw_rules.txt data/nsfw
+          cp meta_rules.txt data/meta
+
+          # Clone generator v2fly
+          git clone https://github.com/v2fly/domain-list-community.git generator
+          cd generator
+          go run main.go --datapath=../data
+          mv geosite.dat ../geosite.dat
+          cd ..
+          rm -rf generator data
+
+      - name: Commit and Push All Output Files
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt
-          git diff-index --quiet HEAD || (git pull --rebase origin main && git commit -m "Fix push conflict and update rulesets" && git push)
+          git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt geosite.dat
+          git diff-index --quiet HEAD || (git pull --rebase origin main && git commit -m "Auto-compile geosite.dat and update rulesets" && git push)
