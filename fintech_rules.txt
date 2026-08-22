@@ -18,6 +18,7 @@ bca.co.id
 bcasyariah.co.id
 bibit.id
 bjb.co.id
+blibli.com
 blubybcadigital.id
 bni.co.id
 bniwondr.co.id
@@ -25,6 +26,7 @@ bri.co.id
 brimo.bri.co.id
 bsi.co.id
 btpn.com
+bukalapak.com
 cimbniaga.co.id
 dana.id
 danamon.co.id
@@ -45,6 +47,8 @@ jenius.com
 klikbca.com
 kredivo.com
 krom.id
+lazada.co.id
+lazada.com
 linebank.co.id
 linkaja.id
 livin.bankmandiri.co.id
@@ -67,11 +71,17 @@ pintu.co.id
 pluang.com
 sakuku.com
 seabank.co.id
+shopee.co.id
 shopeepay.co.id
+shopeesz.com
 sinarmas.co.id
 stockbit.com
 superbank.id
 tokocrypto.com
+tokopedia.com
+tokopedia.link
+tokopedia.net
 tripay.co.id
 uob.co.id
 xendit.co
+zalora.co.id
