@@ -73,17 +73,11 @@ jobs:
           cp nsfw_rules.txt data/nsfw
           cp meta_rules.txt data/meta
 
-          # Pembersihan ketat untuk kepatuhan parser v2fly domain list
-          sed -i 's/^\*\.//g' data/*
-          sed -i 's/^\*//g' data/*
-          sed -i '/\*/d' data/*
-          sed -i 's/^\.//g' data/*
-          sed -i 's/^-//g' data/*
-          sed -i '/^-/d' data/*
-          grep -E '^([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}$' data/adblock > data/adblock.clean && mv data/adblock.clean data/adblock
-          grep -E '^([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}$' data/malware > data/malware.clean && mv data/malware.clean data/malware
-          grep -E '^([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}$' data/nsfw > data/nsfw.clean && mv data/nsfw.clean data/nsfw
-          grep -E '^([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,}$' data/meta > data/meta.clean && mv data/meta.clean data/meta
+          # Pembersihan agresif: Hanya izinkan huruf, angka, titik, dan strip (-). Buang underscore (_).
+          grep -E '^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$' data/adblock > data/adblock.clean && mv data/adblock.clean data/adblock
+          grep -E '^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$' data/malware > data/malware.clean && mv data/malware.clean data/malware
+          grep -E '^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$' data/nsfw > data/nsfw.clean && mv data/nsfw.clean data/nsfw
+          grep -E '^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$' data/meta > data/meta.clean && mv data/meta.clean data/meta
 
           # Clone generator v2fly
           git clone https://github.com/v2fly/domain-list-community.git generator
@@ -98,4 +92,4 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt geosite.dat
-          git diff-index --quiet HEAD || (git pull --rebase origin main && git commit -m "Fix invalid domain prefixes and build geosite.dat" && git push)
+          git diff-index --quiet HEAD || (git pull --rebase origin main && git commit -m "Fix underscore domains and build geosite.dat" && git push)
