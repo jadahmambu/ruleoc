@@ -11,7 +11,7 @@ Dioptimalkan khusus untuk **OpenClash**, **Clash Premium**, **v2rayN**, **Xray**
 - 🔄 **Pembaruan Otomatis**: Diperbarui secara berkala setiap hari pukul 00:00 UTC.
 - 🧹 **Sanitasi Ketat**: Pembersihan domain dari karakter ilegal (`*`, `_`, prefix bermasalah) agar kompatibel dengan v2fly compiler.
 - ⚡ **Multi-Format**: Mendukung format biner Protobuf (`.dat`) dan format daftar domain teks (`.txt`).
-- 🛑 **Proteksi Lengkap**: Kombinasi AdBlock, Phishing/Malware, NSFW, Meta (FB/IG/WA), dan TikTok.
+- 🛑 **Proteksi Lengkap**: Kombinasi AdBlock, Phishing/Malware, NSFW, Meta (FB/IG/WA), TikTok, dan Bank/E-Wallet (Fintech).
 
 ---
 
@@ -21,7 +21,7 @@ Dioptimalkan khusus untuk **OpenClash**, **Clash Premium**, **v2rayN**, **Xray**
 
 | Nama Berkas | Tag Terdaftar | Deskripsi | Link Unduhan Direct |
 | :--- | :--- | :--- | :--- |
-| `geosite.dat` | `adblock`, `malware`, `nsfw`, `meta`, `tiktok` | Kompilasi domain biner lengkap | [Download `geosite.dat`](https://github.com/jadahmambu/ruleoc/releases/download/release/geosite.dat) |
+| `geosite.dat` | `adblock`, `malware`, `nsfw`, `meta`, `tiktok`, `fintech` | Kompilasi domain biner lengkap | [Download `geosite.dat`](https://github.com/jadahmambu/ruleoc/releases/download/release/geosite.dat) |
 | `geoip.dat` | `private`, `id`, `facebook`, `google`, `telegram`, dll. | Kompilasi IP CIDR biner resmi v2fly | [Download `geoip.dat`](https://github.com/jadahmambu/ruleoc/releases/download/release/geoip.dat) |
 
 ### 2. Berkas Teks Plain (Domain List)
@@ -33,6 +33,7 @@ Dioptimalkan khusus untuk **OpenClash**, **Clash Premium**, **v2rayN**, **Xray**
 | `nsfw_rules.txt` | StevenBlack Porn, Sinfonietta | [nsfw_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/nsfw_rules.txt) |
 | `meta_rules.txt` | v2fly Facebook, Instagram, WhatsApp | [meta_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/meta_rules.txt) |
 | `tiktok_rules.txt` | v2fly TikTok, ByteDance CDN | [tiktok_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/tiktok_rules.txt) |
+| `fintech_rules.txt` | Perbankan Indonesia & E-Wallet (BCA, Mandiri, BRI, GoPay, OVO, Dana, dll) | [fintech_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/fintech_rules.txt) |
 
 ---
 
@@ -49,6 +50,7 @@ Gunakan referensi ini untuk memilih tag mana yang ingin Anda masukkan ke dalam a
 | **`nsfw`** | Situs dewasa / konten pornografi | **REJECT** (Filter negatif) |
 | **`meta`** | Facebook, Instagram, WhatsApp, & Threads | **DIRECT** (Bypass proxy) |
 | **`tiktok`** | TikTok, TikTok CDN, ByteDance, & Live Streaming | **DIRECT** atau **Proxy Khusus** |
+| **`fintech`** | Aplikasi Perbankan (BCA, Mandiri, BRI, BNI) & E-Wallet (GoPay, OVO, Dana, ShopeePay) | **DIRECT** (Wajib agar tidak terblokir IP Proxy) |
 
 ### B. Tag GeoIP (`geoip.dat`)
 
@@ -78,9 +80,10 @@ rules:
   - GEOSITE,malware,REJECT
   - GEOSITE,nsfw,REJECT
 
-  # Routing Network & Sosmed (GEOIP & GEOSITE)
+  # Routing Network & Finansial (GEOIP & GEOSITE)
   - GEOIP,private,DIRECT
   - GEOIP,id,DIRECT
+  - GEOSITE,fintech,DIRECT
   - GEOSITE,meta,DIRECT
   - GEOIP,facebook,DIRECT
   - GEOSITE,tiktok,DIRECT
@@ -113,10 +116,18 @@ rule-providers:
     path: ./ruleset/tiktok_rules.yaml
     interval: 86400
 
+  fintech-rules:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/fintech_rules.txt"
+    path: ./ruleset/fintech_rules.yaml
+    interval: 86400
+
 rules:
   - RULE-SET,adblock-rules,REJECT
   - RULE-SET,meta-rules,DIRECT
   - RULE-SET,tiktok-rules,DIRECT
+  - RULE-SET,fintech-rules,DIRECT
 ```
 
 ---
@@ -140,7 +151,8 @@ rules:
       "outboundTag": "direct",
       "geosite": [
         "ext:geosite.dat:meta",
-        "ext:geosite.dat:tiktok"
+        "ext:geosite.dat:tiktok",
+        "ext:geosite.dat:fintech"
       ],
       "geoip": [
         "private",
@@ -164,7 +176,7 @@ rules:
       "outbound": "block"
     },
     {
-      "geosite": ["meta", "tiktok"],
+      "geosite": ["meta", "tiktok", "fintech"],
       "geoip": ["private", "id", "facebook"],
       "outbound": "direct"
     }
