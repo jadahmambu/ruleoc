@@ -1,4 +1,4 @@
-name: Update AdBlock Ruleset
+name: Update All Rulesets Separately
 
 on:
   schedule:
@@ -12,37 +12,48 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch and Merge Rules
+      - name: Fetch and Process Rules
         run: |
-          touch temp.txt
+          touch temp_ads.txt temp_nsfw.txt temp_meta.txt
 
-          # 1. Download Filter Iklan & Tracker
-          curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp.txt || true
-          curl -sSL "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp.txt || true
+          # -------------------------------------------------------------
+          # 1. PROSES RULE ADS & TRACKER -> adblock_rules.txt
+          # -------------------------------------------------------------
+          curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_ads.txt || true
+          curl -sSL "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp_ads.txt || true
 
-          # 2. Download Filter Situs Dewasa / Porno
-          curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp.txt || true
-          curl -sSL "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts" | grep '^127.0.0.1' | awk '{print $2}' >> temp.txt || true
-
-          # 3. Download Filter Meta (Facebook, Instagram, WhatsApp, Threads)
-          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/facebook.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp.txt || true
-          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/instagram.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp.txt || true
-          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/whatsapp.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp.txt || true
-
-          # 4. Gabungkan dengan blacklist manual jika file my-blacklist.txt ada
           if [ -f my-blacklist.txt ]; then
-            cat my-blacklist.txt >> temp.txt || true
+            cat my-blacklist.txt >> temp_ads.txt || true
           fi
 
-          # 5. Bersihkan spasi, komentar, dan duplikat
-          sed -i '/^[[:space:]]*$/d' temp.txt
-          sed -i '/^#/d' temp.txt
-          sort -u temp.txt > adblock_rules.txt
-          rm -f temp.txt
+          sed -i '/^[[:space:]]*$/d' temp_ads.txt && sed -i '/^#/d' temp_ads.txt
+          sort -u temp_ads.txt > adblock_rules.txt
 
-      - name: Commit and Push Updated List
+          # -------------------------------------------------------------
+          # 2. PROSES RULE NSFW / PORNO -> nsfw_rules.txt
+          # -------------------------------------------------------------
+          curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_nsfw.txt || true
+          curl -sSL "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts" | grep '^127.0.0.1' | awk '{print $2}' >> temp_nsfw.txt || true
+
+          sed -i '/^[[:space:]]*$/d' temp_nsfw.txt && sed -i '/^#/d' temp_nsfw.txt
+          sort -u temp_nsfw.txt > nsfw_rules.txt
+
+          # -------------------------------------------------------------
+          # 3. PROSES RULE META (FB, IG, WA, Threads) -> meta_rules.txt
+          # -------------------------------------------------------------
+          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/facebook.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp_meta.txt || true
+          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/instagram.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp_meta.txt || true
+          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/whatsapp.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp_meta.txt || true
+
+          sed -i '/^[[:space:]]*$/d' temp_meta.txt && sed -i '/^#/d' temp_meta.txt
+          sort -u temp_meta.txt > meta_rules.txt
+
+          # Bersihkan file sementara
+          rm -f temp_ads.txt temp_nsfw.txt temp_meta.txt
+
+      - name: Commit and Push Updated Lists
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add adblock_rules.txt
-          git diff-index --quiet HEAD || (git commit -m "Auto-update all rules (Ads, NSFW, Meta)" && git push)
+          git add adblock_rules.txt nsfw_rules.txt meta_rules.txt
+          git diff-index --quiet HEAD || (git commit -m "Auto-update separate rulesets (Ads, NSFW, Meta)" && git push)
