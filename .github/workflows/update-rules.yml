@@ -76,7 +76,7 @@ jobs:
           sed -i '/^[[:space:]]*$/d' temp_tiktok.txt && sed -i '/^#/d' temp_tiktok.txt
           sort -u temp_tiktok.txt > tiktok_rules.txt
 
-          # 6. PROSES RULE FINTECH LENGKAP (BANK, BANK DIGITAL, E-WALLET, PAYMENT GATEWAY & INVESTASI)
+          # 6. PROSES RULE FINTECH (BANK, E-WALLET, PAYMENT GATEWAY, INVESTASI & ONLINE SHOP)
           # Bank BUMN & Syariah
           echo "bca.co.id" >> temp_fintech.txt
           echo "klikbca.com" >> temp_fintech.txt
@@ -92,7 +92,7 @@ jobs:
           echo "bsi.co.id" >> temp_fintech.txt
           echo "bankbtn.co.id" >> temp_fintech.txt
 
-          # Bank Swasta & Asing
+          # Bank Swasta & Regional
           echo "cimbniaga.co.id" >> temp_fintech.txt
           echo "octoclicks.com" >> temp_fintech.txt
           echo "danamon.co.id" >> temp_fintech.txt
@@ -150,7 +150,7 @@ jobs:
           echo "durianpay.id" >> temp_fintech.txt
           echo "tripay.co.id" >> temp_fintech.txt
 
-          # Paylater, Kreditor & Investasi Legal (OJK)
+          # Paylater, Kreditor & Investasi Legal
           echo "kredivo.com" >> temp_fintech.txt
           echo "akulaku.com" >> temp_fintech.txt
           echo "atome.id" >> temp_fintech.txt
@@ -163,6 +163,18 @@ jobs:
           echo "stockbit.com" >> temp_fintech.txt
           echo "pluang.com" >> temp_fintech.txt
           echo "ajaib.co.id" >> temp_fintech.txt
+
+          # Online Shop & E-Commerce
+          echo "shopee.co.id" >> temp_fintech.txt
+          echo "shopeesz.com" >> temp_fintech.txt
+          echo "tokopedia.com" >> temp_fintech.txt
+          echo "tokopedia.net" >> temp_fintech.txt
+          echo "lazada.co.id" >> temp_fintech.txt
+          echo "lazada.com" >> temp_fintech.txt
+          echo "blibli.com" >> temp_fintech.txt
+          echo "bukalapak.com" >> temp_fintech.txt
+          echo "zalora.co.id" >> temp_fintech.txt
+          echo "tokopedia.link" >> temp_fintech.txt
 
           sed -i '/^[[:space:]]*$/d' temp_fintech.txt && sed -i '/^#/d' temp_fintech.txt
           sort -u temp_fintech.txt > fintech_rules.txt
@@ -206,7 +218,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt tiktok_rules.txt fintech_rules.txt geosite.dat geoip.dat
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Update full fintech ruleset and rebuild geosite.dat"
+            git commit -m "Add Online Shop & E-Commerce to fintech ruleset and rebuild geosite.dat"
             git pull --rebase origin main -X ours
             git push
           fi
@@ -216,7 +228,7 @@ jobs:
         with:
           tag_name: release
           name: "Latest Geosite & GeoIP Ruleset Build"
-          body: "Automated build of geosite.dat, geoip.dat, and domain lists including Full Fintech/Banking."
+          body: "Automated build of geosite.dat, geoip.dat, and domain lists including Bank, E-Wallet, & E-Commerce."
           files: |
             geosite.dat
             geoip.dat
