@@ -95,17 +95,41 @@ jobs:
         run: |
           mkdir -p ip_data
           
-          # Unduh daftar IP CIDR resmi untuk Meta / Facebook
+          # Unduh daftar IP CIDR resmi
           curl -sSL "https://raw.githubusercontent.com/v2fly/geoip/release/text/facebook.txt" -o ip_data/meta
-          
-          # Unduh GeoIP standar Indonesia (ID) & Private/LAN
           curl -sSL "https://raw.githubusercontent.com/v2fly/geoip/release/text/id.txt" -o ip_data/id
           curl -sSL "https://raw.githubusercontent.com/v2fly/geoip/release/text/private.txt" -o ip_data/private
 
-          # Build geoip-compiler
+          # Clone generator geoip
           git clone https://github.com/v2fly/geoip.git geoip_src
           cd geoip_src
-          go run ./ --input=../ip_data --action=output-dat --output=../geoip.dat
+
+          # Buat config.json sesuai spesifikasi kompiler terbaru v2fly/geoip
+          cat <<EOF > config.json
+          {
+            "input": [
+              {
+                "type": "v2rayGeoIP1",
+                "action": "add",
+                "args": {
+                  "uri": "../ip_data"
+                }
+              }
+            ],
+            "output": [
+              {
+                "type": "v2rayGeoIP1",
+                "action": "output",
+                "args": {
+                  "outputName": "../geoip.dat"
+                }
+              }
+            ]
+          }
+          EOF
+
+          # Jalankan kompilasi menggunakan file konfigurasi
+          go run ./ -c config.json
           cd ..
           rm -rf geoip_src ip_data
 
