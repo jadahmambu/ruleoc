@@ -67,11 +67,16 @@ jobs:
 
       - name: Build geosite.dat Binary
         run: |
-          # Persiapan struktur folder generator domain-list-community
+          # Copy file ke struktur data v2fly
           cp adblock_rules.txt data/adblock
           cp malware_rules.txt data/malware
           cp nsfw_rules.txt data/nsfw
           cp meta_rules.txt data/meta
+
+          # Bersihkan wildcard (*) yang tidak didukung v2fly dari seluruh file data
+          sed -i 's/^\*\.//g' data/*
+          sed -i 's/^\*//g' data/*
+          sed -i '/\*/d' data/*
 
           # Clone generator v2fly
           git clone https://github.com/v2fly/domain-list-community.git generator
@@ -86,4 +91,4 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt geosite.dat
-          git diff-index --quiet HEAD || (git pull --rebase origin main && git commit -m "Auto-compile geosite.dat and update rulesets" && git push)
+          git diff-index --quiet HEAD || (git pull --rebase origin main && git commit -m "Fix wildcard domains and build geosite.dat" && git push)
