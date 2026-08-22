@@ -22,7 +22,7 @@ Dioptimalkan khusus untuk **OpenClash**, **Clash Premium**, **v2rayN**, **Xray**
 | Nama Berkas | Tag Terdaftar | Deskripsi | Link Unduhan Direct |
 | :--- | :--- | :--- | :--- |
 | `geosite.dat` | `adblock`, `malware`, `nsfw`, `meta`, `tiktok` | Kompilasi domain biner lengkap | [Download `geosite.dat`](https://github.com/jadahmambu/ruleoc/releases/download/release/geosite.dat) |
-| `geoip.dat` | `private`, `id`, `facebook`, dll. | Kompilasi IP CIDR biner resmi v2fly | [Download `geoip.dat`](https://github.com/jadahmambu/ruleoc/releases/download/release/geoip.dat) |
+| `geoip.dat` | `private`, `id`, `facebook`, `google`, `telegram`, dll. | Kompilasi IP CIDR biner resmi v2fly | [Download `geoip.dat`](https://github.com/jadahmambu/ruleoc/releases/download/release/geoip.dat) |
 
 ### 2. Berkas Teks Plain (Domain List)
 
@@ -36,12 +36,60 @@ Dioptimalkan khusus untuk **OpenClash**, **Clash Premium**, **v2rayN**, **Xray**
 
 ---
 
-## 📖 Cara Penggunaan & Integrasi
+## 📊 Rincian Isi Tag Geosite & GeoIP
 
-### A. Penggunaan di OpenClash (Metode `Rule-Provider` Teks)
+Gunakan referensi ini untuk memilih tag mana yang ingin Anda masukkan ke dalam aturan routing:
 
-Tambahkan ke dalam berkas konfigurasi `config.yaml` OpenClash Anda:
+### A. Tag Geosite (`geosite.dat`)
 
+| Tag Geosite | Cakupan Domain & Sumber | Rekomendasi Aksi / Routing |
+| :--- | :--- | :--- |
+| **`adblock`** | Domain iklan, tracker, analytics, & telemetry | **REJECT** (Blokir iklan) |
+| **`malware`** | Domain phishing, malware, virus, scam, & judi online | **REJECT** (Keamanan) |
+| **`nsfw`** | Situs dewasa / konten pornografi | **REJECT** (Filter negatif) |
+| **`meta`** | Facebook, Instagram, WhatsApp, & Threads | **DIRECT** (Bypass proxy) |
+| **`tiktok`** | TikTok, TikTok CDN, ByteDance, & Live Streaming | **DIRECT** atau **Proxy Khusus** |
+
+### B. Tag GeoIP (`geoip.dat`)
+
+| Tag GeoIP | Cakupan IP CIDR | Rekomendasi Aksi / Routing |
+| :--- | :--- | :--- |
+| **`private`** | Blok IP LAN/Lokal Network (`192.168.x.x`, `10.x.x.x`, `127.0.0.1`) | **DIRECT** (Wajib agar LAN tak terputus) |
+| **`id`** | Seluruh IP publik lokal Indonesia | **DIRECT** (Bypass trafik domestik) |
+| **`facebook`** / **`meta`** | Blok IP server Meta / Facebook / WhatsApp | **DIRECT** |
+| **`google`** | Blok IP infrastruktur Google & YouTube | **DIRECT** atau **Proxy** |
+| **`cloudflare`** | Blok IP CDN Cloudflare | **DIRECT** atau **Proxy** |
+| **`telegram`** | Blok IP server pusat Telegram | **DIRECT** atau **Proxy** |
+| **`netflix`** | Blok IP server CDN streaming Netflix | **DIRECT** atau **Proxy Khusus** |
+
+---
+
+## 📖 Cara Penggunaan & Format Penulisan Rule
+
+### 1. OpenClash / Clash Premium (`config.yaml`)
+
+#### A. Menggunakan Biner (`geosite.dat` & `geoip.dat`)
+Unduh `geosite.dat` dan `geoip.dat`, letakkan di folder `/etc/openclash/` atau `/etc/openclash/RuleSet/`.
+
+```yaml
+rules:
+  # Pemblokiran Keamanan (GEOSITE)
+  - GEOSITE,adblock,REJECT
+  - GEOSITE,malware,REJECT
+  - GEOSITE,nsfw,REJECT
+
+  # Routing Network & Sosmed (GEOIP & GEOSITE)
+  - GEOIP,private,DIRECT
+  - GEOIP,id,DIRECT
+  - GEOSITE,meta,DIRECT
+  - GEOIP,facebook,DIRECT
+  - GEOSITE,tiktok,DIRECT
+
+  # Match Sisanya ke Proxy
+  - MATCH,Proxy-Group
+```
+
+#### B. Menggunakan Teks Plain (`rule-providers`)
 ```yaml
 rule-providers:
   adblock-rules:
@@ -49,20 +97,6 @@ rule-providers:
     behavior: domain
     url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/adblock_rules.txt"
     path: ./ruleset/adblock_rules.yaml
-    interval: 86400
-
-  malware-rules:
-    type: http
-    behavior: domain
-    url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/malware_rules.txt"
-    path: ./ruleset/malware_rules.yaml
-    interval: 86400
-
-  nsfw-rules:
-    type: http
-    behavior: domain
-    url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/nsfw_rules.txt"
-    path: ./ruleset/nsfw_rules.yaml
     interval: 86400
 
   meta-rules:
@@ -80,42 +114,14 @@ rule-providers:
     interval: 86400
 
 rules:
-  # Pemblokiran Keamanan & Iklan
   - RULE-SET,adblock-rules,REJECT
-  - RULE-SET,malware-rules,REJECT
-  - RULE-SET,nsfw-rules,REJECT
-
-  # Routing Aplikasi & Sosmed
   - RULE-SET,meta-rules,DIRECT
   - RULE-SET,tiktok-rules,DIRECT
 ```
 
 ---
 
-### B. Penggunaan di OpenClash / V2Ray / Xray (Metode Biner `geosite.dat` & `geoip.dat`)
-
-Unduh berkas `geosite.dat` dan `geoip.dat` dari rilis terbaru, lalu letakkan di direktori OpenClash (`/etc/openclash/RuleSet/` atau `/etc/openclash/`).
-
-#### 1. Contoh Skrip OpenClash (`config.yaml`):
-
-```yaml
-rules:
-  # Pemblokiran Keamanan
-  - GEOSITE,adblock,REJECT
-  - GEOSITE,malware,REJECT
-  - GEOSITE,nsfw,REJECT
-
-  # Routing Koneksi & Media Sosial
-  - GEOIP,private,DIRECT
-  - GEOIP,id,DIRECT
-  - GEOSITE,meta,DIRECT
-  - GEOSITE,tiktok,DIRECT
-
-  # Default Proxy Group
-  - MATCH,Proxy-Group
-```
-
-#### 2. Contoh Routing V2Ray / Xray (`config.json`):
+### 2. V2Ray / Xray (`config.json`)
 
 ```json
 "routing": {
@@ -141,6 +147,26 @@ rules:
         "id",
         "facebook"
       ]
+    }
+  ]
+}
+```
+
+---
+
+### 3. Sing-Box (`config.json`)
+
+```json
+"route": {
+  "rules": [
+    {
+      "geosite": ["adblock", "malware", "nsfw"],
+      "outbound": "block"
+    },
+    {
+      "geosite": ["meta", "tiktok"],
+      "geoip": ["private", "id", "facebook"],
+      "outbound": "direct"
     }
   ]
 }
