@@ -64,4 +64,4 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt
-          git diff-index --quiet HEAD || (git commit -m "Fix YAML syntax and update rulesets" && git push)
+          git diff-index --quiet HEAD || (git pull --rebase origin main && git commit -m "Fix push conflict and update rulesets" && git push)
