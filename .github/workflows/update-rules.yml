@@ -1,0 +1,37 @@
+name: Update AdBlock Ruleset
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Jalan otomatis jam 12 malam
+  workflow_dispatch: # Memicu eksekusi manual kapan saja
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and Merge Rules
+        run: |
+          # Download dari sumber luar
+          curl -sSL https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | grep '^0.0.0.0' | awk '{print $2}' > temp.txt
+          curl -sSL https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp.txt
+          
+          # Gabungkan dengan blacklist manual
+          if [ -f my-blacklist.txt ]; then
+            cat my-blacklist.txt >> temp.txt
+          fi
+
+          # Bersihkan duplikat dan baris kosong
+          sed -i '/^[[:space:]]*$/d' temp.txt
+          sed -i '/^#/d' temp.txt
+          sort -u temp.txt > adblock_rules.txt
+          rm -f temp.txt
+
+      - name: Commit and Push Updated List
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add adblock_rules.txt
+          git diff-index --quiet HEAD || (git commit -m "Auto-update adblock list" && git push)
