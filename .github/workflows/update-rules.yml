@@ -2,8 +2,8 @@ name: Update AdBlock Ruleset
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Jalan otomatis jam 12 malam
-  workflow_dispatch: # Memicu eksekusi manual kapan saja
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,16 +14,20 @@ jobs:
 
       - name: Fetch and Merge Rules
         run: |
-          # Download dari sumber luar
+          # 1. Download Iklan & Tracker
           curl -sSL https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | grep '^0.0.0.0' | awk '{print $2}' > temp.txt
           curl -sSL https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp.txt
           
-          # Gabungkan dengan blacklist manual
+          # 2. Download Filter Situs Dewasa / Porno (StevenBlack Adult extension & OISD Extra)
+          curl -sSL https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts | grep '^0.0.0.0' | awk '{print $2}' >> temp.txt
+          curl -sSL https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts | grep '^127.0.0.1' | awk '{print $2}' >> temp.txt
+
+          # 3. Gabungkan dengan blacklist manual
           if [ -f my-blacklist.txt ]; then
             cat my-blacklist.txt >> temp.txt
           fi
 
-          # Bersihkan duplikat dan baris kosong
+          # 4. Bersihkan duplikat dan baris kosong
           sed -i '/^[[:space:]]*$/d' temp.txt
           sed -i '/^#/d' temp.txt
           sort -u temp.txt > adblock_rules.txt
@@ -34,4 +38,84 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt
-          git diff-index --quiet HEAD || (git commit -m "Auto-update adblock list" && git push)
+          git diff-index --quiet HEAD || (git commit -m "Auto-update adblock & nsfw list" && git push)name: Update AdBlock Ruleset
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and Merge Rules
+        run: |
+          # 1. Download Iklan & Tracker
+          curl -sSL https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | grep '^0.0.0.0' | awk '{print $2}' > temp.txt
+          curl -sSL https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp.txt
+          
+          # 2. Download Filter Situs Dewasa / Porno (StevenBlack Adult extension & OISD Extra)
+          curl -sSL https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts | grep '^0.0.0.0' | awk '{print $2}' >> temp.txt
+          curl -sSL https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts | grep '^127.0.0.1' | awk '{print $2}' >> temp.txt
+
+          # 3. Gabungkan dengan blacklist manual
+          if [ -f my-blacklist.txt ]; then
+            cat my-blacklist.txt >> temp.txt
+          fi
+
+          # 4. Bersihkan duplikat dan baris kosong
+          sed -i '/^[[:space:]]*$/d' temp.txt
+          sed -i '/^#/d' temp.txt
+          sort -u temp.txt > adblock_rules.txt
+          rm -f temp.txt
+
+      - name: Commit and Push Updated List
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add adblock_rules.txt
+          git diff-index --quiet HEAD || (git commit -m "Auto-update adblock & nsfw list" && git push)name: Update AdBlock Ruleset
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and Merge Rules
+        run: |
+          # 1. Download Iklan & Tracker
+          curl -sSL https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | grep '^0.0.0.0' | awk '{print $2}' > temp.txt
+          curl -sSL https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp.txt
+          
+          # 2. Download Filter Situs Dewasa / Porno (StevenBlack Adult extension & OISD Extra)
+          curl -sSL https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts | grep '^0.0.0.0' | awk '{print $2}' >> temp.txt
+          curl -sSL https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts | grep '^127.0.0.1' | awk '{print $2}' >> temp.txt
+
+          # 3. Gabungkan dengan blacklist manual
+          if [ -f my-blacklist.txt ]; then
+            cat my-blacklist.txt >> temp.txt
+          fi
+
+          # 4. Bersihkan duplikat dan baris kosong
+          sed -i '/^[[:space:]]*$/d' temp.txt
+          sed -i '/^#/d' temp.txt
+          sort -u temp.txt > adblock_rules.txt
+          rm -f temp.txt
+
+      - name: Commit and Push Updated List
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add adblock_rules.txt
+          git diff-index --quiet HEAD || (git commit -m "Auto-update adblock & nsfw list" && git push)
