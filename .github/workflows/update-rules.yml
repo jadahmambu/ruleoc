@@ -25,9 +25,9 @@ jobs:
           mkdir -p data
           touch temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt temp_fintech.txt
 
-          # 1. PROSES RULE ADS & TRACKER (OTOMATIS)
-          curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_ads.txt || true
-          curl -sSL "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp_ads.txt || true
+          # 1. PROSES RULE ADS & TRACKER
+          curl -sSLf "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_ads.txt || true
+          curl -sSLf "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp_ads.txt || true
 
           if [ -f my-blacklist.txt ]; then
             cat my-blacklist.txt >> temp_ads.txt || true
@@ -36,25 +36,25 @@ jobs:
           sed -i '/^[[:space:]]*$/d' temp_ads.txt && sed -i '/^#/d' temp_ads.txt
           sort -u temp_ads.txt > adblock_rules.txt
 
-          # 2. PROSES RULE MALWARE & PHISHING (OTOMATIS)
-          curl -sSL "https://urlhaus.abuse.ch/downloads/hostfile/" | grep '^127.0.0.1' | awk '{print $2}' >> temp_malware.txt || true
-          curl -sSL "https://raw.githubusercontent.com/malware-filter/phishing-filter/main/phishing-hosts.txt" | grep '^0.0.0.0' | awk '{print $2}' >> temp_malware.txt || true
-          curl -sSL "https://big.oisd.nl/domainswild" >> temp_malware.txt || true
+          # 2. PROSES RULE MALWARE & PHISHING
+          curl -sSLf "https://urlhaus.abuse.ch/downloads/hostfile/" | grep '^127.0.0.1' | awk '{print $2}' >> temp_malware.txt || true
+          curl -sSLf "https://raw.githubusercontent.com/malware-filter/phishing-filter/main/phishing-hosts.txt" | grep '^0.0.0.0' | awk '{print $2}' >> temp_malware.txt || true
+          curl -sSLf "https://big.oisd.nl/domainswild" >> temp_malware.txt || true
 
           sed -i '/^[[:space:]]*$/d' temp_malware.txt && sed -i '/^#/d' temp_malware.txt
           sort -u temp_malware.txt > malware_rules.txt
 
-          # 3. PROSES RULE NSFW / PORNO (OTOMATIS)
-          curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_nsfw.txt || true
-          curl -sSL "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts" | grep '^127.0.0.1' | awk '{print $2}' >> temp_nsfw.txt || true
+          # 3. PROSES RULE NSFW / PORNO
+          curl -sSLf "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_nsfw.txt || true
+          curl -sSLf "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts" | grep '^127.0.0.1' | awk '{print $2}' >> temp_nsfw.txt || true
 
           sed -i '/^[[:space:]]*$/d' temp_nsfw.txt && sed -i '/^#/d' temp_nsfw.txt
           sort -u temp_nsfw.txt > nsfw_rules.txt
 
-          # 4. PROSES RULE META (FB, IG, WA, Threads) (OTOMATIS)
-          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/facebook" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
-          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/instagram" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
-          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/whatsapp" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
+          # 4. PROSES RULE META (FB, IG, WA, Threads)
+          curl -sSLf "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/facebook" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
+          curl -sSLf "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/instagram" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
+          curl -sSLf "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/whatsapp" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
 
           echo "facebook.com" >> temp_meta.txt
           echo "instagram.com" >> temp_meta.txt
@@ -66,8 +66,8 @@ jobs:
           sed -i '/^[[:space:]]*$/d' temp_meta.txt && sed -i '/^#/d' temp_meta.txt
           sort -u temp_meta.txt > meta_rules.txt
 
-          # 5. PROSES RULE TIKTOK (OTOMATIS)
-          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/tiktok" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_tiktok.txt || true
+          # 5. PROSES RULE TIKTOK
+          curl -sSLf "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/tiktok" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_tiktok.txt || true
           echo "tiktok.com" >> temp_tiktok.txt
           echo "tiktokcdn.com" >> temp_tiktok.txt
           echo "byteoversea.com" >> temp_tiktok.txt
@@ -76,14 +76,15 @@ jobs:
           sed -i '/^[[:space:]]*$/d' temp_tiktok.txt && sed -i '/^#/d' temp_tiktok.txt
           sort -u temp_tiktok.txt > tiktok_rules.txt
 
-          # 6. PROSES RULE FINTECH, BANK & ONLINE SHOP (OTOMATIS HIBRIDA)
-          # A. Mengambil otomatis dari repositori open-source komunitas v2fly & blackmatrix7
-          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-bank-id" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_fintech.txt || true
-          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-ecommerce" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_fintech.txt || true
-          curl -sSL "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Shopee/Shopee.list" | grep -v '^#' | grep -v '^IP-CIDR' | awk -F',' '{print $2}' >> temp_fintech.txt || true
-          curl -sSL "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Tokopedia/Tokopedia.list" | grep -v '^#' | grep -v '^IP-CIDR' | awk -F',' '{print $2}' >> temp_fintech.txt || true
+          # 6. PROSES RULE FINTECH, BANK & ONLINE SHOP (SUMBER STABIL)
+          # A. Ambil dari v2fly resmi (Category Bank ID & E-Commerce)
+          curl -sSLf "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-bank-id" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_fintech.txt || true
+          curl -sSLf "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/category-ecommerce" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_fintech.txt || true
 
-          # B. Backup domain utama lokal agar tidak pernah terlewat
+          # B. Ambil dari Loyalsoldier (E-Commerce & Paypal/Fintech)
+          curl -sSLf "https://raw.githubusercontent.com/Loyalsoldier/v2ray-rules-dat/release/direct-list.txt" | grep -iE 'shopee|tokopedia|lazada|blibli|bukalapak|bca|mandiri|bri|bni|gopay|ovo|dana' >> temp_fintech.txt || true
+
+          # C. Domain penting lokal sebagai penopang utama
           echo "bca.co.id" >> temp_fintech.txt
           echo "klikbca.com" >> temp_fintech.txt
           echo "mybca.bca.co.id" >> temp_fintech.txt
@@ -141,7 +142,7 @@ jobs:
 
       - name: Fetch Official geoip.dat
         run: |
-          curl -sSL "https://github.com/v2fly/geoip/releases/latest/download/geoip.dat" -o geoip.dat
+          curl -sSLf "https://github.com/v2fly/geoip/releases/latest/download/geoip.dat" -o geoip.dat
 
       - name: Commit and Push All Output Files
         run: |
@@ -149,7 +150,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt tiktok_rules.txt fintech_rules.txt geosite.dat geoip.dat
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Auto-fetch full fintech, banking, & ecommerce rules and rebuild geosite.dat"
+            git commit -m "Fix 404 URL, auto-fetch stable fintech & ecommerce rules, rebuild geosite.dat"
             git pull --rebase origin main -X ours
             git push
           fi
@@ -159,7 +160,7 @@ jobs:
         with:
           tag_name: release
           name: "Latest Geosite & GeoIP Ruleset Build"
-          body: "Automated build of geosite.dat, geoip.dat, and domain lists with full auto-fetched Fintech/Online Shop data."
+          body: "Automated build of geosite.dat, geoip.dat, and domain lists with stable Fintech/Online Shop sources."
           files: |
             geosite.dat
             geoip.dat
