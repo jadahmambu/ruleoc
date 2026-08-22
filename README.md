@@ -1,3 +1,4 @@
+Markdown
 # 🛡️ RuleOC - Custom Geosite, GeoIP & Filter Rulesets
 
 Sistem otomatis berbasis GitHub Actions untuk mengumpulkan, membersihkan, dan mengompilasi daftar domain serta IP ke dalam format biner (`geosite.dat` & `geoip.dat`) dan teks plain (`.txt`). 
@@ -88,3 +89,58 @@ rules:
   # Routing Aplikasi & Sosmed
   - RULE-SET,meta-rules,DIRECT
   - RULE-SET,tiktok-rules,DIRECT
+B. Penggunaan di OpenClash / V2Ray / Xray (Metode Biner geosite.dat & geoip.dat)
+Unduh berkas geosite.dat dan geoip.dat dari rilis terbaru, lalu letakkan di direktori OpenClash (/etc/openclash/RuleSet/ atau /etc/openclash/).
+
+1. Contoh Skrip OpenClash (config.yaml):
+YAML
+rules:
+  # Pemblokiran Keamanan
+  - GEOSITE,adblock,REJECT
+  - GEOSITE,malware,REJECT
+  - GEOSITE,nsfw,REJECT
+
+  # Routing Koneksi & Media Sosial
+  - GEOIP,private,DIRECT
+  - GEOIP,id,DIRECT
+  - GEOSITE,meta,DIRECT
+  - GEOSITE,tiktok,DIRECT
+
+  # Default Proxy Group
+  - MATCH,Proxy-Group
+2. Contoh Routing V2Ray / Xray (config.json):
+JSON
+"routing": {
+  "rules": [
+    {
+      "type": "field",
+      "outboundTag": "blocked",
+      "geosite": [
+        "ext:geosite.dat:adblock",
+        "ext:geosite.dat:malware",
+        "ext:geosite.dat:nsfw"
+      ]
+    },
+    {
+      "type": "field",
+      "outboundTag": "direct",
+      "geosite": [
+        "ext:geosite.dat:meta",
+        "ext:geosite.dat:tiktok"
+      ],
+      "geoip": [
+        "private",
+        "id",
+        "facebook"
+      ]
+    }
+  ]
+}
+🛠️ Lisensi & Sumber Data
+StevenBlack Hosts: StevenBlack/hosts
+
+AdGuard Filters: AdGuardDNS
+
+URLhaus Threat Intelligence: abuse.ch
+
+v2fly Community Data: v2fly/domain-list-community & v2fly/geoip
