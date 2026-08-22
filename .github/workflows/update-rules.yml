@@ -5,6 +5,9 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -98,3 +101,18 @@ jobs:
             git pull --rebase origin main -X ours
             git push
           fi
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: release
+          name: "Latest Geosite Ruleset Build"
+          body: "Automated build of geosite.dat and domain lists."
+          files: |
+            geosite.dat
+            adblock_rules.txt
+            malware_rules.txt
+            nsfw_rules.txt
+            meta_rules.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
