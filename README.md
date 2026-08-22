@@ -1,4 +1,3 @@
-Markdown
 # 🛡️ RuleOC - Custom Geosite, GeoIP & Filter Rulesets
 
 Sistem otomatis berbasis GitHub Actions untuk mengumpulkan, membersihkan, dan mengompilasi daftar domain serta IP ke dalam format biner (`geosite.dat` & `geoip.dat`) dan teks plain (`.txt`). 
@@ -48,35 +47,35 @@ rule-providers:
   adblock-rules:
     type: http
     behavior: domain
-    url: "[https://raw.githubusercontent.com/jadahmambu/ruleoc/main/adblock_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/adblock_rules.txt)"
+    url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/adblock_rules.txt"
     path: ./ruleset/adblock_rules.yaml
     interval: 86400
 
   malware-rules:
     type: http
     behavior: domain
-    url: "[https://raw.githubusercontent.com/jadahmambu/ruleoc/main/malware_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/malware_rules.txt)"
+    url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/malware_rules.txt"
     path: ./ruleset/malware_rules.yaml
     interval: 86400
 
   nsfw-rules:
     type: http
     behavior: domain
-    url: "[https://raw.githubusercontent.com/jadahmambu/ruleoc/main/nsfw_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/nsfw_rules.txt)"
+    url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/nsfw_rules.txt"
     path: ./ruleset/nsfw_rules.yaml
     interval: 86400
 
   meta-rules:
     type: http
     behavior: domain
-    url: "[https://raw.githubusercontent.com/jadahmambu/ruleoc/main/meta_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/meta_rules.txt)"
+    url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/meta_rules.txt"
     path: ./ruleset/meta_rules.yaml
     interval: 86400
 
   tiktok-rules:
     type: http
     behavior: domain
-    url: "[https://raw.githubusercontent.com/jadahmambu/ruleoc/main/tiktok_rules.txt](https://raw.githubusercontent.com/jadahmambu/ruleoc/main/tiktok_rules.txt)"
+    url: "https://raw.githubusercontent.com/jadahmambu/ruleoc/main/tiktok_rules.txt"
     path: ./ruleset/tiktok_rules.yaml
     interval: 86400
 
@@ -89,11 +88,17 @@ rules:
   # Routing Aplikasi & Sosmed
   - RULE-SET,meta-rules,DIRECT
   - RULE-SET,tiktok-rules,DIRECT
-B. Penggunaan di OpenClash / V2Ray / Xray (Metode Biner geosite.dat & geoip.dat)
-Unduh berkas geosite.dat dan geoip.dat dari rilis terbaru, lalu letakkan di direktori OpenClash (/etc/openclash/RuleSet/ atau /etc/openclash/).
+```
 
-1. Contoh Skrip OpenClash (config.yaml):
-YAML
+---
+
+### B. Penggunaan di OpenClash / V2Ray / Xray (Metode Biner `geosite.dat` & `geoip.dat`)
+
+Unduh berkas `geosite.dat` dan `geoip.dat` dari rilis terbaru, lalu letakkan di direktori OpenClash (`/etc/openclash/RuleSet/` atau `/etc/openclash/`).
+
+#### 1. Contoh Skrip OpenClash (`config.yaml`):
+
+```yaml
 rules:
   # Pemblokiran Keamanan
   - GEOSITE,adblock,REJECT
@@ -108,8 +113,11 @@ rules:
 
   # Default Proxy Group
   - MATCH,Proxy-Group
-2. Contoh Routing V2Ray / Xray (config.json):
-JSON
+```
+
+#### 2. Contoh Routing V2Ray / Xray (`config.json`):
+
+```json
 "routing": {
   "rules": [
     {
@@ -136,11 +144,12 @@ JSON
     }
   ]
 }
-🛠️ Lisensi & Sumber Data
-StevenBlack Hosts: StevenBlack/hosts
+```
 
-AdGuard Filters: AdGuardDNS
+---
 
-URLhaus Threat Intelligence: abuse.ch
-
-v2fly Community Data: v2fly/domain-list-community & v2fly/geoip
+## 🛠️ Lisensi & Sumber Data
+- **StevenBlack Hosts**: [StevenBlack/hosts](https://github.com/StevenBlack/hosts)
+- **AdGuard Filters**: [AdGuardDNS](https://github.com/AdGuardTeam/AdGuardSDNSFilter)
+- **URLhaus Threat Intelligence**: [abuse.ch](https://urlhaus.abuse.ch/)
+- **v2fly Community Data**: [v2fly/domain-list-community](https://github.com/v2fly/domain-list-community) & [v2fly/geoip](https://github.com/v2fly/geoip)
