@@ -23,7 +23,7 @@ jobs:
       - name: Fetch and Process Domain Rules
         run: |
           mkdir -p data
-          touch temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt
+          touch temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt
 
           # 1. PROSES RULE ADS & TRACKER
           curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_ads.txt || true
@@ -66,7 +66,17 @@ jobs:
           sed -i '/^[[:space:]]*$/d' temp_meta.txt && sed -i '/^#/d' temp_meta.txt
           sort -u temp_meta.txt > meta_rules.txt
 
-          rm -f temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt
+          # 5. PROSES RULE TIKTOK
+          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/tiktok" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_tiktok.txt || true
+          echo "tiktok.com" >> temp_tiktok.txt
+          echo "tiktokcdn.com" >> temp_tiktok.txt
+          echo "byteoversea.com" >> temp_tiktok.txt
+          echo "ibytedtos.com" >> temp_tiktok.txt
+
+          sed -i '/^[[:space:]]*$/d' temp_tiktok.txt && sed -i '/^#/d' temp_tiktok.txt
+          sort -u temp_tiktok.txt > tiktok_rules.txt
+
+          rm -f temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt
 
       - name: Build geosite.dat Binary
         run: |
@@ -74,6 +84,7 @@ jobs:
           cp malware_rules.txt data/malware
           cp nsfw_rules.txt data/nsfw
           cp meta_rules.txt data/meta
+          cp tiktok_rules.txt data/tiktok
 
           sed -i 's/^\*\.//g' data/*
           sed -i 's/^\*//g' data/*
@@ -83,6 +94,7 @@ jobs:
           grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/malware > data/malware.clean && mv data/malware.clean data/malware
           grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/nsfw > data/nsfw.clean && mv data/nsfw.clean data/nsfw
           grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/meta > data/meta.clean && mv data/meta.clean data/meta
+          grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/tiktok > data/tiktok.clean && mv data/tiktok.clean data/tiktok
 
           git clone https://github.com/v2fly/domain-list-community.git generator
           cd generator
@@ -93,16 +105,15 @@ jobs:
 
       - name: Fetch Official geoip.dat
         run: |
-          # Ambil rilis biner geoip.dat resmi v2fly yang diperbarui harian
           curl -sSL "https://github.com/v2fly/geoip/releases/latest/download/geoip.dat" -o geoip.dat
 
       - name: Commit and Push All Output Files
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt geosite.dat geoip.dat
+          git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt tiktok_rules.txt geosite.dat geoip.dat
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Auto-compile geosite.dat, fetch geoip.dat, and update rulesets"
+            git commit -m "Add TikTok ruleset and rebuild geosite.dat"
             git pull --rebase origin main -X ours
             git push
           fi
@@ -112,7 +123,7 @@ jobs:
         with:
           tag_name: release
           name: "Latest Geosite & GeoIP Ruleset Build"
-          body: "Automated build of geosite.dat, geoip.dat, and domain lists."
+          body: "Automated build of geosite.dat, geoip.dat, and domain lists including TikTok."
           files: |
             geosite.dat
             geoip.dat
@@ -120,5 +131,141 @@ jobs:
             malware_rules.txt
             nsfw_rules.txt
             meta_rules.txt
+            tiktok_rules.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}name: Update Rulesets and Build Geosite/GeoIP
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.20'
+
+      - name: Fetch and Process Domain Rules
+        run: |
+          mkdir -p data
+          touch temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt
+
+          # 1. PROSES RULE ADS & TRACKER
+          curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_ads.txt || true
+          curl -sSL "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp_ads.txt || true
+
+          if [ -f my-blacklist.txt ]; then
+            cat my-blacklist.txt >> temp_ads.txt || true
+          fi
+
+          sed -i '/^[[:space:]]*$/d' temp_ads.txt && sed -i '/^#/d' temp_ads.txt
+          sort -u temp_ads.txt > adblock_rules.txt
+
+          # 2. PROSES RULE MALWARE & PHISHING
+          curl -sSL "https://urlhaus.abuse.ch/downloads/hostfile/" | grep '^127.0.0.1' | awk '{print $2}' >> temp_malware.txt || true
+          curl -sSL "https://raw.githubusercontent.com/malware-filter/phishing-filter/main/phishing-hosts.txt" | grep '^0.0.0.0' | awk '{print $2}' >> temp_malware.txt || true
+          curl -sSL "https://big.oisd.nl/domainswild" >> temp_malware.txt || true
+
+          sed -i '/^[[:space:]]*$/d' temp_malware.txt && sed -i '/^#/d' temp_malware.txt
+          sort -u temp_malware.txt > malware_rules.txt
+
+          # 3. PROSES RULE NSFW / PORNO
+          curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp_nsfw.txt || true
+          curl -sSL "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts" | grep '^127.0.0.1' | awk '{print $2}' >> temp_nsfw.txt || true
+
+          sed -i '/^[[:space:]]*$/d' temp_nsfw.txt && sed -i '/^#/d' temp_nsfw.txt
+          sort -u temp_nsfw.txt > nsfw_rules.txt
+
+          # 4. PROSES RULE META (FB, IG, WA, Threads)
+          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/facebook" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
+          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/instagram" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
+          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/whatsapp" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_meta.txt || true
+
+          echo "facebook.com" >> temp_meta.txt
+          echo "instagram.com" >> temp_meta.txt
+          echo "whatsapp.com" >> temp_meta.txt
+          echo "whatsapp.net" >> temp_meta.txt
+          echo "threads.net" >> temp_meta.txt
+          echo "meta.com" >> temp_meta.txt
+
+          sed -i '/^[[:space:]]*$/d' temp_meta.txt && sed -i '/^#/d' temp_meta.txt
+          sort -u temp_meta.txt > meta_rules.txt
+
+          # 5. PROSES RULE TIKTOK
+          curl -sSL "https://raw.githubusercontent.com/v2fly/domain-list-community/master/data/tiktok" | grep -v '^#' | grep -v '^include:' | awk '{print $1}' | sed 's/full://g' >> temp_tiktok.txt || true
+          echo "tiktok.com" >> temp_tiktok.txt
+          echo "tiktokcdn.com" >> temp_tiktok.txt
+          echo "byteoversea.com" >> temp_tiktok.txt
+          echo "ibytedtos.com" >> temp_tiktok.txt
+
+          sed -i '/^[[:space:]]*$/d' temp_tiktok.txt && sed -i '/^#/d' temp_tiktok.txt
+          sort -u temp_tiktok.txt > tiktok_rules.txt
+
+          rm -f temp_ads.txt temp_malware.txt temp_nsfw.txt temp_meta.txt temp_tiktok.txt
+
+      - name: Build geosite.dat Binary
+        run: |
+          cp adblock_rules.txt data/adblock
+          cp malware_rules.txt data/malware
+          cp nsfw_rules.txt data/nsfw
+          cp meta_rules.txt data/meta
+          cp tiktok_rules.txt data/tiktok
+
+          sed -i 's/^\*\.//g' data/*
+          sed -i 's/^\*//g' data/*
+          sed -i 's/^\.//g' data/*
+
+          grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/adblock > data/adblock.clean && mv data/adblock.clean data/adblock
+          grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/malware > data/malware.clean && mv data/malware.clean data/malware
+          grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/nsfw > data/nsfw.clean && mv data/nsfw.clean data/nsfw
+          grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/meta > data/meta.clean && mv data/meta.clean data/meta
+          grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' data/tiktok > data/tiktok.clean && mv data/tiktok.clean data/tiktok
+
+          git clone https://github.com/v2fly/domain-list-community.git generator
+          cd generator
+          go run main.go --datapath=../data
+          mv dlc.dat ../geosite.dat
+          cd ..
+          rm -rf generator data
+
+      - name: Fetch Official geoip.dat
+        run: |
+          curl -sSL "https://github.com/v2fly/geoip/releases/latest/download/geoip.dat" -o geoip.dat
+
+      - name: Commit and Push All Output Files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add adblock_rules.txt malware_rules.txt nsfw_rules.txt meta_rules.txt tiktok_rules.txt geosite.dat geoip.dat
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Add TikTok ruleset and rebuild geosite.dat"
+            git pull --rebase origin main -X ours
+            git push
+          fi
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: release
+          name: "Latest Geosite & GeoIP Ruleset Build"
+          body: "Automated build of geosite.dat, geoip.dat, and domain lists including TikTok."
+          files: |
+            geosite.dat
+            geoip.dat
+            adblock_rules.txt
+            malware_rules.txt
+            nsfw_rules.txt
+            meta_rules.txt
+            tiktok_rules.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
