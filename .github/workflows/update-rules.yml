@@ -15,15 +15,26 @@ jobs:
       - name: Fetch and Merge Rules
         run: |
           touch temp.txt
+
+          # 1. Download Filter Iklan & Tracker
           curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp.txt || true
           curl -sSL "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^//g' >> temp.txt || true
+
+          # 2. Download Filter Situs Dewasa / Porno
           curl -sSL "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn/hosts" | grep '^0.0.0.0' | awk '{print $2}' >> temp.txt || true
           curl -sSL "https://raw.githubusercontent.com/Sinfonietta/hostfiles/master/pornography-hosts" | grep '^127.0.0.1' | awk '{print $2}' >> temp.txt || true
 
+          # 3. Download Filter Meta (Facebook, Instagram, WhatsApp, Threads)
+          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/facebook.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp.txt || true
+          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/instagram.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp.txt || true
+          curl -sSL "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/whatsapp.txt" | grep -v '^payload:' | sed "s/  - '//g" | sed "s/'//g" | sed 's/^\+\.//g' >> temp.txt || true
+
+          # 4. Gabungkan dengan blacklist manual jika file my-blacklist.txt ada
           if [ -f my-blacklist.txt ]; then
             cat my-blacklist.txt >> temp.txt || true
           fi
 
+          # 5. Bersihkan spasi, komentar, dan duplikat
           sed -i '/^[[:space:]]*$/d' temp.txt
           sed -i '/^#/d' temp.txt
           sort -u temp.txt > adblock_rules.txt
@@ -34,4 +45,4 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add adblock_rules.txt
-          git diff-index --quiet HEAD || (git commit -m "Auto-update adblock and nsfw list" && git push)
+          git diff-index --quiet HEAD || (git commit -m "Auto-update all rules (Ads, NSFW, Meta)" && git push)
