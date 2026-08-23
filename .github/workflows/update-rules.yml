@@ -123,8 +123,8 @@ jobs:
           done < ./community/data/rule-microsoft-raw
           cp ./community/data/rule-microsoft rule-microsoft.txt
 
-          # 9. ADGUARD DNS REJECT (AMAT AMAN VIA BASH)
-          curl -sSL "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^//g' | grep -v '\*' > ./community/data/adguard-dns || echo "full:ex.com" > ./community/data/adguard-dns
+          # 9. ADGUARD DNS REJECT (PEMBERSIHAN TRAILING DOT & INVALID DOMAIN)
+          curl -sSL "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^.*//g' | sed 's/\.$//g' | grep -E '^([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$' > ./community/data/adguard-dns || echo "full:ex.com" > ./community/data/adguard-dns
           cp ./community/data/adguard-dns adguard-dns.txt
 
           # 10. RULE-SOSMED
@@ -181,9 +181,9 @@ jobs:
 
       - name: Filter and append d3ward to rule-ads
         run: |
-          curl -sSL "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt" | grep '^0.0.0.0 ' | awk '{print $2}' >> ./community/data/rule-ads || true
+          curl -sSL "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt" | grep '^0.0.0.0 ' | awk '{print $2}' | sed 's/\.$//g' >> ./community/data/rule-ads || true
 
-      - name: Automated Dependency Patcher (Fix Include Error)
+      - name: Automated Dependency Patcher (Fix Include Error & Clean Trailing Dots)
         run: |
           grep -hroE 'include:[a-zA-Z0-9\.\-]+' ./community/data/ | awk -F: '{print tolower($2)}' | sort -u | while read -r list_name; do
             if [ ! -f "./community/data/$list_name" ]; then
@@ -191,6 +191,14 @@ jobs:
               echo "full:example-fix-$list_name.com" > "./community/data/$list_name"
             fi
           done
+          
+          # Sanitasi akhir menghapus trailing dots di semua file data
+          for file in ./community/data/*; do
+            if [ -f "$file" ]; then
+              sed -i 's/\.$//g' "$file"
+            fi
+          done
+          
           cp ./community/data/rule-ads rule-ads.txt
 
       - name: Build geosite.dat using Go Install
