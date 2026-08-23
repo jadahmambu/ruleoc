@@ -40,7 +40,6 @@ jobs:
           echo "RULE_BANK_ID=https://raw.githubusercontent.com/malikshi/v2ray-rules-dat/rule/rule_bank-id.txt" >> $GITHUB_ENV
           echo "OISD_FULL=https://big.oisd.nl/dnsmasq" >> $GITHUB_ENV
           echo "OISD_NSFW=https://nsfw.oisd.nl/dnsmasq" >> $GITHUB_ENV
-          echo "ADGUARD_DNS_REJECT_URL=https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" >> $GITHUB_ENV
           
           echo "RULE_ECO=https://raw.githubusercontent.com/jadahmambu/ocrule/main/rule_eco.txt" >> $GITHUB_ENV
           echo "RULE_MICROSOFT=https://raw.githubusercontent.com/jadahmambu/ocrule/main/rule_microsoft.txt" >> $GITHUB_ENV
@@ -124,29 +123,8 @@ jobs:
           done < ./community/data/rule-microsoft-raw
           cp ./community/data/rule-microsoft rule-microsoft.txt
 
-          # 9. ADGUARD DNS REJECT
-          python3 -c '
-import os, urllib.request, re
-url = os.environ.get("ADGUARD_DNS_REJECT_URL")
-try:
-    req = urllib.request.urlopen(url)
-    lines = req.read().decode("utf-8").splitlines()
-    domains = set()
-    for line in lines:
-        line = line.strip()
-        if line.startswith("||") and not line.startswith("||*"):
-            d = line[2:].split("^")[0].split("$")[0].rstrip(".")
-            if re.match(r"^[a-zA-Z0-9][a-zA-Z0-9\.-]*[a-zA-Z0-9]\.[a-zA-Z]{2,}$", d) and ".." not in d and "-." not in d and ".-" not in d:
-                domains.add(d)
-    with open("./community/data/adguard-dns", "w") as f:
-        for d in sorted(domains):
-            f.write(d + "\n")
-except Exception as e:
-    print("AdGuard fetch error:", e)
-'
-          if [ ! -s ./community/data/adguard-dns ]; then
-            echo "full:adguard-dns-dummy.com" > ./community/data/adguard-dns
-          fi
+          # 9. ADGUARD DNS REJECT (AMAT AMAN VIA BASH)
+          curl -sSL "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" | grep '^||' | sed 's/||//g' | sed 's/\^//g' | grep -v '\*' > ./community/data/adguard-dns || echo "full:ex.com" > ./community/data/adguard-dns
           cp ./community/data/adguard-dns adguard-dns.txt
 
           # 10. RULE-SOSMED
@@ -203,20 +181,7 @@ except Exception as e:
 
       - name: Filter and append d3ward to rule-ads
         run: |
-          python3 -c '
-import requests
-try:
-    url = "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt"
-    response = requests.get(url, timeout=10)
-    filtered_lines = [line.replace("0.0.0.0 ", "") for line in response.text.split("\n") if "0.0.0.0 " in line]
-except Exception:
-    filtered_lines = []
-
-with open("./community/data/rule-ads", "a") as file:
-    for line in filtered_lines:
-        if line.strip():
-            file.write(line.strip() + "\n")
-'
+          curl -sSL "https://raw.githubusercontent.com/d3ward/toolz/master/src/d3host.txt" | grep '^0.0.0.0 ' | awk '{print $2}' >> ./community/data/rule-ads || true
 
       - name: Automated Dependency Patcher (Fix Include Error)
         run: |
