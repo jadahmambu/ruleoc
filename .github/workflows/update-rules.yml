@@ -76,137 +76,136 @@ jobs:
           wget -qO ./community/data/bank-id-raw $RULE_BANK_ID || touch ./community/data/bank-id-raw
           cat ./community/data/bank-id-raw > ./community/data/bank-id
           
-          # Inject Tambahan Bank BUMN, Swasta, BPD, Bank Digital, E-Wallet & E-Commerce
           cat << 'EOF' >> ./community/data/bank-id
-          bca.co.id
-          klikbca.com
-          mybca.bca.co.id
-          bcasyariah.co.id
-          bankmandiri.co.id
-          livin.bankmandiri.co.id
-          mandiriripples.com
-          bri.co.id
-          brimo.bri.co.id
-          bni.co.id
-          bniwondr.co.id
-          bsi.co.id
-          bankbsi.co.id
-          bankbtn.co.id
-          btn.co.id
-          cimbniaga.co.id
-          octoclicks.com
-          danamon.co.id
-          permatabank.co.id
-          panin.co.id
-          maybank.co.id
-          ocbc.id
-          ocbcnisp.com
-          btpn.com
-          sinarmas.co.id
-          banksinarmas.com
-          bankmega.com
-          dbs.id
-          dbs.com
-          uob.co.id
-          bankmuamalat.co.id
-          bankpamon.co.id
-          bankbukopin.co.id
-          kbbukopin.com
-          bankmas.co.id
-          mstar.co.id
-          nanobank.id
-          bankina.co.id
-          bankindex.co.id
-          bankganesha.co.id
-          bankmestika.co.id
-          bankmayapada.com
-          bankwoorisaudara.com
-          bankmultarta.co.id
-          bankcta.co.id
-          banksahabatsampoerna.com
-          banksinarharapanbali.co.id
-          bankvictoria.co.id
-          ccbindonesia.com
-          icbc.co.id
-          bankofchina.com
-          shinhan.co.id
-          jtrustbank.co.id
-          bankresonaperdania.co.id
-          mizuho-cb.com
-          smbc.co.id
-          bankdki.co.id
-          bankjateng.co.id
-          bankjatim.co.id
-          bjb.co.id
-          bankbjb.co.id
-          bankjabar.co.id
-          bankkalsel.co.id
-          bankkalbar.co.id
-          bankkaltimtara.co.id
-          bankkalteng.co.id
-          banksumselbabel.com
-          banksumut.co.id
-          banknagari.co.id
-          bankriaukepri.co.id
-          banklampung.co.id
-          bankjambi.co.id
-          bankbengkulu.co.id
-          bankntb.co.id
-          bankntt.co.id
-          banksulselbar.co.id
-          banksulutgo.co.id
-          banksulteng.co.id
-          banksultra.co.id
-          bankmaluku.co.id
-          bankpapua.co.id
-          bankbali.co.id
-          bankbpdbali.id
-          bpddiy.co.id
-          bankjago.com
-          jago.com
-          seabank.co.id
-          blubybcadigital.id
-          jenius.com
-          neo-bank.id
-          bankneo.co.id
-          allocloud.id
-          allobank.id
-          motionbank.id
-          linebank.co.id
-          superbank.id
-          krom.id
-          hijra.id
-          aladinbank.id
-          bankaladin.com
-          amarbank.co.id
-          tunaiku.com
-          gopay.co.id
-          gojek.com
-          ovo.id
-          dana.id
-          shopeepay.co.id
-          linkaja.id
-          flip.id
-          midtrans.com
-          xendit.co
-          doku.com
-          oyindonesia.com
-          isaku.co.id
-          sakuku.com
-          faspay.co.id
-          espay.id
-          durianpay.id
-          tripay.co.id
-          shopee.co.id
-          shopeesz.com
-          tokopedia.com
-          tokopedia.net
-          lazada.co.id
-          lazada.com
-          blibli.com
-          bukalapak.com
-          zalora.co.id
-          tokopedia.link
+bca.co.id
+klikbca.com
+mybca.bca.co.id
+bcasyariah.co.id
+bankmandiri.co.id
+livin.bankmandiri.co.id
+mandiriripples.com
+bri.co.id
+brimo.bri.co.id
+bni.co.id
+bniwondr.co.id
+bsi.co.id
+bankbsi.co.id
+bankbtn.co.id
+btn.co.id
+cimbniaga.co.id
+octoclicks.com
+danamon.co.id
+permatabank.co.id
+panin.co.id
+maybank.co.id
+ocbc.id
+ocbcnisp.com
+btpn.com
+sinarmas.co.id
+banksinarmas.com
+bankmega.com
+dbs.id
+dbs.com
+uob.co.id
+bankmuamalat.co.id
+bankpamon.co.id
+bankbukopin.co.id
+kbbukopin.com
+bankmas.co.id
+mstar.co.id
+nanobank.id
+bankina.co.id
+bankindex.co.id
+bankganesha.co.id
+bankmestika.co.id
+bankmayapada.com
+bankwoorisaudara.com
+bankmultarta.co.id
+bankcta.co.id
+banksahabatsampoerna.com
+banksinarharapanbali.co.id
+bankvictoria.co.id
+ccbindonesia.com
+icbc.co.id
+bankofchina.com
+shinhan.co.id
+jtrustbank.co.id
+bankresonaperdania.co.id
+mizuho-cb.com
+smbc.co.id
+bankdki.co.id
+bankjateng.co.id
+bankjatim.co.id
+bjb.co.id
+bankbjb.co.id
+bankjabar.co.id
+bankkalsel.co.id
+bankkalbar.co.id
+bankkaltimtara.co.id
+bankkalteng.co.id
+banksumselbabel.com
+banksumut.co.id
+banknagari.co.id
+bankriaukepri.co.id
+banklampung.co.id
+bankjambi.co.id
+bankbengkulu.co.id
+bankntb.co.id
+bankntt.co.id
+banksulselbar.co.id
+banksulutgo.co.id
+banksulteng.co.id
+banksultra.co.id
+bankmaluku.co.id
+bankpapua.co.id
+bankbali.co.id
+bankbpdbali.id
+bpddiy.co.id
+bankjago.com
+jago.com
+seabank.co.id
+blubybcadigital.id
+jenius.com
+neo-bank.id
+bankneo.co.id
+allocloud.id
+allobank.id
+motionbank.id
+linebank.co.id
+superbank.id
+krom.id
+hijra.id
+aladinbank.id
+bankaladin.com
+amarbank.co.id
+tunaiku.com
+gopay.co.id
+gojek.com
+ovo.id
+dana.id
+shopeepay.co.id
+linkaja.id
+flip.id
+midtrans.com
+xendit.co
+doku.com
+oyindonesia.com
+isaku.co.id
+sakuku.com
+faspay.co.id
+espay.id
+durianpay.id
+tripay.co.id
+shopee.co.id
+shopeesz.com
+tokopedia.com
+tokopedia.net
+lazada.co.id
+lazada.com
+blibli.com
+bukalapak.com
+zalora.co.id
+tokopedia.link
 EOF
           sed -i '/^[[:space:]]*$/d' ./community/data/bank-id && sed -i '/^#/d' ./community/data/bank-id
           sort -u ./community/data/bank-id -o ./community/data/bank-id
@@ -252,7 +251,7 @@ EOF
           done < ./community/data/rule-microsoft-raw
           cp ./community/data/rule-microsoft rule-microsoft.txt
 
-          # 9. ADGUARD DNS REJECT
+          # 9. ADGUARD DNS REJECT (Indentation Fixed)
           python3 -c '
 import os, urllib.request, re
 url = os.environ.get("ADGUARD_DNS_REJECT_URL")
